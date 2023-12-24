@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+
+<html lang="en-US">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>N Queens</title>
+  <style type="text/css" media="screen">
+body {
+  background-color: white;
+  color: black;
+}
+output {
+  display: block;
+  margin: 1em 0;
+}
+  </style>
+</head>
+
+<body>
+
+<main>
+<h1>N Queens</h1>
+
+<form id="queen" name="queen">
+
+<p><label>Number of queens: <input type="number" id="n" name="n" value="4" min="4"></label></p>
+
+<p><button type="submit">Solve</button></p>
+
+</form>
+
+<p>The <a href="https://en.wikipedia.org/wiki/Eight_queens_puzzle" target="_blank">n queens problem</a>
+is the problem of placing n queens on a n by n chessboard so no 2 queens can attack each other.</p>
+
+<h2>Solutions</h2>
+
+<output id="solutions" for="queen"></output>
+
+</main>
+
+<script>
+/*
+ * String character for the black queen.
+ */
+const BLACK_QUEEN = '\u265B';
+
+/*
+ * String character for the white queen.
+ */
+const WHITE_QUEEN = '\u2655';
+
+/*
+ * Return true if board contains a solution to the n queens problem where n is the length of board.
+ */
+function isSolution(board) {
+  let rows = board.slice().sort(),
+      n = rows.length,
+      row = 0;
+
+  // Check each row and column has ONLY ONE queen
+  for (let i = 0; i < n; i++) {
+    if (rows[i] !== i) {
+      return false;
+    }
+  }
+
+  // Check if there is a queen in rows above that can attack along diagonals
+  for (let column of board) {
+    for (let i = 1; i < (row + 1); i++) {
+      if ((board[row-i] === (column - i)) || (board[row-i] === (column + i))) {
+        return false;
+      }
+    }
+    row++;
+  }
+
+  return true;
+}
+
+/*
+ * Return successive array permutations of the numbers 0 through n - 1.
+ *
+ * This is based on the itertools.permutations() implementation in Python.
+ */
+function* permutations(n) {
+  if (typeof n !== 'number') {
+    throw new TypeError('n must be a positive number.');
+  }
+  if (n <= 0) {
+    throw new RangeError('n must be a positive number.');
+  }
+
+  let pool = [],
+      indices = [],
+      cycles = [],
+      active, i, j, temp;
+
+  for (let r = 0; r < n; r++) {
+    pool.push(r);
+    indices.push(r);
+    cycles.push(n - r);
+  }
+
+  yield indices.map(i => pool[i]);
+
+  active = pool.slice().reverse();
+  while (n > 0) {
+    while (active.length > 0) {
+      i = active.shift();
+      cycles[i] -= 1;
+      if (cycles[i] === 0) {
+        temp = indices[i];
+        for (let r = i + 1; r < n; r++) {
+          indices[r-1] = indices[r];
+        }
+        indices[n-1] = temp;
+        cycles[i] = n - i;
+      }
+      else {
+        j = cycles[i];
+        temp = indices[i];
+        indices[i] = indices[n-j];
+        indices[n-j] = temp;
+        yield indices.map(i => pool[i]);
+        active = pool.slice().reverse();
+        break;
+      }
+    }
+    if (active.length <= 0) {
+      return;
+    }
+  }
+}
+
+/*
+ * A short test suite to confirm the code works.
+ */
+function test() {
+  for (let [value, expected] of [
+    [[0], true],
+    [[0, 1], false],
+    [[0, 1, 2], false],
+    [[0, 1, 2, 3], false],
+    [[1, 3, 0, 2], true],
+    [[2, 0, 3, 1], true]]) {
+    console.assert(isSolution(value) === expected,
+                   {msg: 'isSolution() failed.'});
+  }
+
+  let result = [];
+  for (let value of permutations(1)) {
+    result.push(value);
+  }
+  console.assert(result.length === 1,
+                 {msg: 'permutations() failed.'});
+  console.assert(result[0][0] === 0,
+                 {msg: 'permutations() failed.'});
+  result = [];
+  for (let value of permutations(2)) {
+    result.push(value);
+  }
+  console.assert(result.length === 2,
+                 {msg: 'permutations() failed.'});
+  console.assert(result[0][0] === 0,
+                 {msg: 'permutations() failed.'});
+  console.assert(result[0][1] === 1,
+                 {msg: 'permutations() failed.'});
+  console.assert(result[1][0] === 1,
+                 {msg: 'permutations() failed.'});
+  console.assert(result[1][1] === 0,
+                 {msg: 'permutations() failed.'});
+  result = [];
+  for (let value of permutations(3)) {
+    result.push(value);
+  }
+  console.assert(result.length === 6,
+                 {msg: 'permutations() failed.'});
+  console.assert(result[0][0] === 0,
+                 {msg: 'permutations() failed.'});
+  console.assert(result[0][1] === 1,
+                 {msg: 'permutations() failed.'});
+  console.assert(result[0][2] === 2,
+                 {msg: 'permutations() failed.'});
+  console.assert(result[1][0] === 0,
+                 {msg: 'permutations() failed.'});
+  console.assert(result[1][1] === 2,
+                 {msg: 'permutations() failed.'});
+  console.assert(result[1][2] === 1,
+                 {msg: 'permutations() failed.'});
+  console.assert(result[2][0] === 1,
+                 {msg: 'permutations() failed.'});
+  console.assert(result[2][1] === 0,
+                 {msg: 'permutations() failed.'});
+  console.assert(result[2][2] === 2,
+                 {msg: 'permutations() failed.'});
+  console.assert(result[3][0] === 1,
+                 {msg: 'permutations() failed.'});
+  console.assert(result[3][1] === 2,
+                 {msg: 'permutations() failed.'});
+  console.assert(result[3][2] === 0,
+                 {msg: 'permutations() failed.'});
+  console.assert(result[4][0] === 2,
+                 {msg: 'permutations() failed.'});
+  console.assert(result[4][1] === 0,
+                 {msg: 'permutations() failed.'});
+  console.assert(result[4][2] === 1,
+                 {msg: 'permutations() failed.'});
+  console.assert(result[5][0] === 2,
+                 {msg: 'permutations() failed.'});
+  console.assert(result[5][1] === 1,
+                 {msg: 'permutations() failed.'});
+  console.assert(result[5][2] === 0,
+                 {msg: 'permutations() failed.'});
+}
+test();
+
+const OUTPUT = document.querySelector('#solutions');
+
+const FORM = document.querySelector('#queen');
+FORM.addEventListener('submit', (event) => {
+  let n = parseInt(FORM.n.value, 10),
+      count = 0,
+      result, rows, row;
+
+  result = document.createElement('pre');
+  rows = [];
+  for (let board of permutations(n)) {
+    if (isSolution(board)) {
+      count++;
+      rows.push(count.toFixed());
+      for (let column of board) {
+        row = (new Array(n)).fill(' ');
+        row[column] = BLACK_QUEEN;
+        rows.push('|' + row.join('|') + '|');
+      }
+      rows.push('');
+    }
+  }
+  result.textContent = rows.join('\n');
+
+  OUTPUT.innerHTML = '';
+  OUTPUT.appendChild(result);
+
+  event.preventDefault();
+});
+</script>
+</body>
+
+</html>
