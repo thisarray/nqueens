@@ -14,6 +14,11 @@ output {
   display: block;
   margin: 1em 0;
 }
+pre {
+  font-family: "Courier New", monospace;
+  font-size: 20px;
+  line-height: 20px;
+}
   </style>
 </head>
 
@@ -215,16 +220,15 @@ function test() {
 }
 test();
 
-const OUTPUT = document.querySelector('#solutions');
+/*
+ * Display the solutions to the n queens problem in output as text.
+ */
+function textSolutions(n, output) {
+  let count = 0,
+      rows = [],
+      result = document.createElement('pre'),
+      row;
 
-const FORM = document.querySelector('#queen');
-FORM.addEventListener('submit', (event) => {
-  let n = parseInt(FORM.n.value, 10),
-      count = 0,
-      result, rows, row;
-
-  result = document.createElement('pre');
-  rows = [];
   for (let board of permutations(n)) {
     if (isSolution(board)) {
       count++;
@@ -239,9 +243,15 @@ FORM.addEventListener('submit', (event) => {
   }
   result.textContent = rows.join('\n');
 
-  OUTPUT.innerHTML = '';
-  OUTPUT.appendChild(result);
+  output.innerHTML = '';
+  output.appendChild(result);
+}
 
+const OUTPUT = document.querySelector('#solutions');
+
+const FORM = document.querySelector('#queen');
+FORM.addEventListener('submit', (event) => {
+  textSolutions(parseInt(FORM.n.value, 10), OUTPUT);
   event.preventDefault();
 });
 </script>
