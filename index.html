@@ -19,6 +19,17 @@ pre {
   font-size: 20px;
   line-height: 20px;
 }
+article {
+  display: grid;
+  grid-auto-rows: 20px;
+  margin: 0;
+  padding: 0;
+}
+section {
+  border: 1px solid black;
+  font-size: 14px;
+  text-align: center;
+}
 table {
   border-collapse: collapse;
   margin: 0;
@@ -261,6 +272,41 @@ function textSolutions(n, output) {
 }
 
 /*
+ * Display the solutions to the n queens problem in output as grids.
+ */
+function gridSolutions(n, output) {
+  let count = 0,
+      header, grid, cell;
+
+  output.innerHTML = '';
+
+  for (let board of permutations(n)) {
+    if (isSolution(board)) {
+      count++;
+      header = document.createElement('h3');
+      header.appendChild(document.createTextNode(count.toFixed()));
+      output.appendChild(header);
+
+      grid = document.createElement('article');
+      grid.style.gridTemplateColumns = `20px `.repeat(n).trim();
+      for (let column of board) {
+        for (let i = 0; i < n; i++) {
+          cell = document.createElement('section');
+          if (i === column) {
+            cell.appendChild(document.createTextNode(BLACK_QUEEN));
+          }
+          else {
+            cell.appendChild(document.createTextNode(' '));
+          }
+          grid.appendChild(cell);
+        }
+      }
+      output.appendChild(grid);
+    }
+  }
+}
+
+/*
  * Display the solutions to the n queens problem in output as tables.
  */
 function tableSolutions(n, output) {
@@ -300,7 +346,7 @@ const OUTPUT = document.querySelector('#solutions');
 
 const FORM = document.querySelector('#queen');
 FORM.addEventListener('submit', (event) => {
-  tableSolutions(parseInt(FORM.n.value, 10), OUTPUT);
+  gridSolutions(parseInt(FORM.n.value, 10), OUTPUT);
   event.preventDefault();
 });
 </script>
