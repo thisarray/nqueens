@@ -10,6 +10,11 @@ body {
   background-color: white;
   color: black;
 }
+ul {
+  list-style: none inside none;
+  margin: 0.5em;
+  padding: 0;
+}
 output {
   display: block;
   margin: 1em 0;
@@ -54,6 +59,20 @@ td {
 <form id="queen" name="queen">
 
 <p><label>Number of queens: <input type="number" id="n" name="n" value="4" min="4"></label></p>
+
+<p>Display solutions as:</p>
+
+<ul>
+  <li>
+    <label><input type="radio" name="display" value="grid">Grid</label>
+  </li>
+  <li>
+    <label><input type="radio" name="display" value="table">Table</label>
+  </li>
+  <li>
+    <label><input type="radio" name="display" value="text" checked>Text</label>
+  </li>
+</ul>
 
 <p><button type="submit">Solve</button></p>
 
@@ -346,7 +365,19 @@ const OUTPUT = document.querySelector('#solutions');
 
 const FORM = document.querySelector('#queen');
 FORM.addEventListener('submit', (event) => {
-  gridSolutions(parseInt(FORM.n.value, 10), OUTPUT);
+  let n = parseInt(FORM.n.value, 10),
+      display = FORM.display.value.trim().toLowerCase();
+
+  if (display === 'grid') {
+    gridSolutions(n, OUTPUT);
+  }
+  else if (display === 'table') {
+    tableSolutions(n, OUTPUT);
+  }
+  else {
+    textSolutions(n, OUTPUT);
+  }
+
   event.preventDefault();
 });
 </script>
