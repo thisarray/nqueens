@@ -49,7 +49,8 @@ td {
   width: 17px;
 }
 tr:nth-child(odd) > td:nth-child(even),
-tr:nth-child(even) > td:nth-child(odd) {
+tr:nth-child(even) > td:nth-child(odd),
+.highlight {
   background-color: goldenrod;
 }
   </style>
@@ -299,6 +300,7 @@ function textSolutions(n, output) {
  */
 function gridSolutions(n, output) {
   let count = 0,
+      cellCount = 0,
       header, grid, cell;
 
   output.innerHTML = '';
@@ -321,7 +323,14 @@ function gridSolutions(n, output) {
           else {
             cell.appendChild(document.createTextNode(' '));
           }
+          if ((((Math.floor(cellCount / n) % 2) === 0) && (((cellCount % n) % 2) === 1)) ||
+              (((Math.floor(cellCount / n) % 2) === 1) && (((cellCount % n) % 2) === 0))) {
+            // Highlight the even cells of the odd rows and the odd cells of the even rows
+            cell.classList.add('highlight');
+          }
           grid.appendChild(cell);
+
+          cellCount++;
         }
       }
       output.appendChild(grid);
